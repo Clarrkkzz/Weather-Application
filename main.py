@@ -23,14 +23,14 @@ async def get_weather(location: str, start_date: str, end_date: str):
                 if redis_client.exists(cache_key):
                     cached_data = redis_client.get(cache_key)
                     return {"data": cached_data, "source": "cache"}
+
+                response = await client.get(f"{base_url}/{location}/{start_date}/{end_date}?unitGroup=metric&key={API_KEY}&contentType=json")
+                if response.status_code == 200:
+                    data = response.json()
+                    redis_client.set(cache_key, str(data))  # Cache for 1 hour
+                    return data
                 else:
-                    response = await client.get(f"{base_url}/{location}/{start_date}/{end_date}?unitGroup=metric&key={API_KEY}&contentType=json")
-                    if response.status_code == 200:
-                        data = response.json()
-                        redis_client.set(cache_key, str(data))  # Cache for 1 hour
-                        return data
-                    else:
-                        return {"error": "Unable to fetch weather data", "status_code": response.status_code}
+                    return {"error": "Unable to fetch weather data", "status_code": response.status_code}
     except Exception as e:
         return {"error": str(e)}
     
