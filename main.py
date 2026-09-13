@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from dotenv import load_dotenv
 import httpx
 import redis 
+from redisapp import fifofull
 
 load_dotenv()
 
@@ -25,9 +26,12 @@ async def get_weather(location: str, start_date: str, end_date: str):
                     return {"data": cached_data, "source": "cache"}
 
                 response = await client.get(f"{base_url}/{location}/{start_date}/{end_date}?unitGroup=metric&key={API_KEY}&contentType=json")
+                #when didn't get a response from cache 
                 if response.status_code == 200:
                     data = response.json()
                     redis_client.set(cache_key, str(data))  # Cache for 1 hour
+                    redis_client.rpush("fifo_queue", cache_key)  # Add to FIFO queue
+                    await fifofull.noofelement()  # Check if we need to clear the cache
                     return data
                 else:
                     return {"error": "Unable to fetch weather data", "status_code": response.status_code}
