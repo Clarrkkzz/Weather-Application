@@ -31,7 +31,7 @@ async def get_weather(request: Request, location: str, start_date: str, end_date
     try:
         cache_key = f"{location}_{start_date}_{end_date}"
         #loader function to get the data from the API if not presentin  cache
-        async def fetch_weather_from_api():
+        async def fetch_weather_from_api(key=None):
             async with httpx.AsyncClient() as client:
                 url = f"{base_url}/{location}/{start_date}/{end_date}?unitGroup=metric&key={API_KEY}&contentType=json"
                 params = {
@@ -45,7 +45,7 @@ async def get_weather(request: Request, location: str, start_date: str, end_date
                     return data
         #loads the data from cache is present, otherwise calls the loader function defined earlier to get the data from the API  
         client_ip = request.client.host
-        allowed = await limiter.allow(f"ip:{client_ip}")
+        allowed = limiter.allow(f"ip:{client_ip}")
         if not allowed:
             return {"error": "Rate limit exceeded. Please try again later."}, 429
             
