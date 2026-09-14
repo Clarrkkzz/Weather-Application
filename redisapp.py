@@ -13,7 +13,6 @@ class fifofull:
             redis_client.delete(oldest_key)  # Delete the oldest key from Redis
     async def noofelement():
         maxelements = 4 
-        info = redis_client.info()
         length = redis_client.llen("fifo_queue")
         if length > maxelements:  # If Redis memory usage exceeds the specified size
             oldest_key = redis_client.lpop("fifo_queue") # Clear the cache
@@ -33,6 +32,4 @@ class cacheAside:
         if value is not None:
             self.redis_client.set(key, value, ex=ttl or self.default_ttl)
         return value
-
-
 
