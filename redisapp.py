@@ -20,7 +20,19 @@ class fifofull:
             redis_client.delete(oldest_key)  # Delete the oldest key from Redis
 
 
+class cacheAside:
+    def __init__(self, redis_client: redis.Redis, default_ttl: int = 3600):
+        self.redis_client = redis_client
+        self.default_ttl = default_ttl
 
-      
+    def get(self, key: str, loader, ttl):
+        cached_value = self.redis_client.get(key)
+        if cached_value is not None:
+            return cached_value
+        value = loader(key)
+        if value is not None:
+            self.redis_client.set(key, value, ex=ttl or self.default_ttl)
+        return value
+
 
 
