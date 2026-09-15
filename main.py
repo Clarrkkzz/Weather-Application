@@ -5,6 +5,7 @@ import httpx
 import redis 
 from token_bucket import TokenBucket
 from redisapp import fifofull, cacheAside
+import json
 
 
 load_dotenv()
@@ -45,7 +46,7 @@ async def get_weather(request: Request, location: str, start_date: str, end_date
                     return data
         #loads the data from cache is present, otherwise calls the loader function defined earlier to get the data from the API  
         client_ip = request.client.host
-        allowed = limiter.allow(f"ip:{client_ip}")
+        allowed, remaining = limiter.allow(f"ip:{client_ip}")
         if not allowed:
             return {"error": "Rate limit exceeded. Please try again later."}, 429
             

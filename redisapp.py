@@ -1,4 +1,6 @@
 import redis
+from requests import get
+import json
 
 redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
@@ -24,12 +26,12 @@ class cacheAside:
         self.redis_client = redis_client
         self.default_ttl = default_ttl
 
-    def get(self, key: str, loader, ttl):
+    async def get(self, key: str, loader, ttl):
         cached_value = self.redis_client.get(key)
         if cached_value is not None:
             return cached_value
-        value = loader(key)
+        value = await loader(key)
         if value is not None:
-            self.redis_client.set(key, value, ex=ttl or self.default_ttl)
+            self.redis_client.set(key, json.dumps(value), ex=ttl or self.default_ttl)
         return value
 
