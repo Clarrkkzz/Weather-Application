@@ -6,7 +6,7 @@ import redis
 from token_bucket import TokenBucket
 from repositories.redisapp import fifofull, LRUcacheAside 
 import json
-from api.weather import fetch_weather_from_api
+from api.api import fetch_weather_from_api
 
 
 load_dotenv()

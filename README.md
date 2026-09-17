@@ -11,6 +11,8 @@ This backend is a lightweight, Redis-backed weather API that combines **caching,
 - A **token bucket rate limiter** protects the service from excessive request bursts.
 - The system is optimized for repeated weather lookups across similar date and location combinations.
 
+---
+
 ## Architecture
 
 The project is structured around a simple request flow:
@@ -22,6 +24,20 @@ The project is structured around a simple request flow:
 5. If the result is missing, the application fetches fresh weather data from the external API.
 6. The response is stored in Redis with a TTL.
 7. The LRU tracking queue manages which keys remain in the active cache set.
+
+
+
+![System Architecture](images/SystemArchitecture.png)
+
+---
+
+## Database Design
+
+
+
+![Database Schema](images/Database.png)
+
+---
 
 ## Cache Refresh Behavior
 

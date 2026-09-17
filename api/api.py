@@ -17,5 +17,5 @@ async def fetch_weather_from_api(base_url, location, start_date, end_date) -> js
                 response = await client.get(url, params=params)
                 if response.status_code == 200:
                     data = response.json()
-                    return json.dumps(data)
+                    return data
 
